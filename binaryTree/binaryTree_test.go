@@ -5,7 +5,7 @@ import(
 )
 
 func TestBinaryTree(t *testing.T) {
-    bTree, err := NewLeaf(nil, nil, nil)
+    bTree, err := NewLeaf(nil)
     if err != nil {
         t.Errorf("Recieved unexpected error from NewLeaf(): \n%s", err)
     }

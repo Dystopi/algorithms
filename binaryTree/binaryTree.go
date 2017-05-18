@@ -7,51 +7,29 @@ import(
 )
 
 type lessCallback    func(b *BinaryTree, new interface{}) (bool, error)
-type insertCallback  func(b *BinaryTree, new interface{}) error
-type searchCallback  func(b *BinaryTree, desired interface{}) (*BinaryTree, error)
 
 type BinaryTree struct {
     value           interface{}
     leftLeaf        *BinaryTree
     rightLeaf       *BinaryTree
-    insert          insertCallback
-    search          searchCallback
     less            lessCallback
 }
 
-func NewLeaf(comp lessCallback, ins insertCallback, srch searchCallback) (*BinaryTree, error) {
+func NewLeaf(comp lessCallback) (*BinaryTree, error) {
     if comp == nil {
         comp = defaultComparisonCallback
-    }
-    if ins == nil {
-        ins = defaultInsert
-    }
-    if srch == nil {
-        srch = defaultSearch
     }
     return &BinaryTree{
         value:          nil,
         less:           comp,
-        insert:         ins,
-        search:         srch,
     }, nil
 }
 
-// Not attaching logic directly to struct to allow for ease of testing
-// new Insertion / Search / Comparison algorithms
 func (b *BinaryTree) Insert(newValue interface{}) error {
-    return b.insert(b, newValue)
-}
-
-func (b *BinaryTree) Search(desired interface{}) (*BinaryTree, error) {
-    return b.search(b, desired)
-}
-
-func defaultInsert(b *BinaryTree, newValue interface{}) error {
     if b.value == nil {
         b.value = newValue
-        b.rightLeaf, _  = NewLeaf(b.less, b.insert, b.search)
-        b.leftLeaf, _   = NewLeaf(b.less, b.insert, b.search)
+        b.rightLeaf, _  = NewLeaf(b.less)
+        b.leftLeaf, _   = NewLeaf(b.less)
     } else {
         isLess, err := b.less(b, newValue)
         if  err != nil {
@@ -67,7 +45,7 @@ func defaultInsert(b *BinaryTree, newValue interface{}) error {
     return nil
 }
 
-func defaultSearch(b *BinaryTree, desired interface{}) (*BinaryTree, error) {
+func (b *BinaryTree) Search(desired interface{}) (*BinaryTree, error) {
     if b.value == nil {
         return nil, errors.New(fmt.Sprintf("Unable to locate desired value : %v", desired))
     }
